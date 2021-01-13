@@ -1,6 +1,6 @@
 import os
 import json
-import torch
+import torch # hidden requirement: tables
 import matplotlib.pyplot as plt
 
 import database as db
