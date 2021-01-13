@@ -1,0 +1,57 @@
+import json
+import torch
+import numpy as np
+from matplotlib import pyplot as plt
+
+import database as db
+import neural
+
+with open('config.json', 'r') as infile:
+    config = json.load(infile)
+    CONFIG_TRANSFORMS = config['transforms']
+
+eval_stocks = db.load_txt('./stock_lists/training_tickers.txt')
+
+df = db.download_history(eval_stocks, cache_name='eval_stocks', start='2000-01-01', interval='1d')
+
+df = db.apply_config_transforms(df, CONFIG_TRANSFORMS) # Adds more data (technicals, etc)
+
+loader_training, loader_validation = neural.generatetrainingLoaders(df, shuffle=True, batch_size=100, date='2018-01-02')
+
+state = torch.load('model.pt')
+n_input = state['n_input']
+model = neural.LSTM(n_input) # Resets model with a batch size of target list length
+model.load_state_dict(state['model'])
+model.eval()
+print('LSTM loaded')
+
+data, label = next(iter(loader_validation))
+data = data.float()
+
+out_norm = model(data).detach().view(-1).numpy()
+
+last = data[:, -1, 0].numpy()
+label = label.view(-1).numpy()
+
+dx_label = label-last
+dx_norm = out_norm-last
+
+accuracy_norm = (np.sum(np.logical_and(dx_label < 0, dx_norm < 0))+np.sum(np.logical_and(dx_label > 0, dx_norm > 0))) / 100
+print(f'Accuracy of model: {accuracy_norm:.3f}')
+
+accuracy_alwaysup = np.sum(np.sum(np.logical_and(dx_label > 0, 1)))/100
+print(f'Accuracy of always predicting up: {accuracy_alwaysup:.3f}')
+
+rng = np.random.default_rng()
+random = rng.integers(2, size=100)
+accuracy_random = (np.sum(np.logical_and(dx_label < 0, random))+np.sum(np.logical_and(dx_label > 0, random))) / 100
+print(f'Accuracy of always predicting randomly: {accuracy_random:.3f}')
+
+p = np.argsort(dx_label)
+dx_label = dx_label[p]
+dx_norm = dx_norm[p]
+
+plt.plot(dx_label, '.r')
+plt.plot(dx_norm, '.g')
+plt.plot(np.zeros(100))
+plt.show()

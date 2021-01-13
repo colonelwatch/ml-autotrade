@@ -1,0 +1,33 @@
+{
+    "transforms": {
+        "tech": [
+            "bollinger",
+            "rsi",
+            "macd",
+            "obv"
+        ],
+        "crosscorrelate": [
+            "^GSPC"
+        ],
+        "drop": [
+            "Adj Close"
+        ]
+    },
+    "force_cpu": true,
+    "learning_rate": 0.001,
+    "epochs": 2,
+    "batch_size": 32,
+    "model": {
+        "input_timesteps": 10,
+        "hidden_size": 64,
+        "layer_count": 3
+    },
+    "num_workers": 3,
+    "df_slice_length": 100,
+    "alpaca": {
+        "key": "<API_KEY>",
+        "secret": "<API_SECRET>",
+        "url": "<API_URL>"
+    },
+    "seconds_before_close": 900
+}
