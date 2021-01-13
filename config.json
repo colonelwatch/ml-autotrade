@@ -10,7 +10,9 @@
             "^GSPC"
         ],
         "drop": [
-            "Adj Close"
+            "Adj Close",
+            "^GSPC Stock Splits",
+            "^GSPC Dividends"
         ]
     },
     "force_cpu": true,
