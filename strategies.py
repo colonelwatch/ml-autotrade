@@ -46,7 +46,7 @@ def predictreturns(df, target_tickers):
     mn = df_slice_close.min().values
     mx = df_slice_close.max().values
     
-    arr = db.normalize(df_slice, exclude_label=True).values
+    arr = db.normalize(df_slice).values
     # Converts dataframe into tensor with dimensions (batch/tickers, length/time, features/indicators)
     input_tensor = torch.tensor(arr).reshape(tensor_length, -1, n_input).permute(1, 0, 2).float()
     
