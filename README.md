@@ -19,7 +19,7 @@ There are also five configurable files, where a working example is already confi
     parameters along with the Alpaca API key.
 2) `strategies.py`: Abstracted Python functions that outlines strategies based on neural network predictions, portfolio 
     holdings, and portfolio cash-on-hand. Raw "latest" market data can also be accessed.
-3) `stock_lists/training_tickers.txt`: Tickers whose histories with be trained on by the neural network.
+3) `stock_lists/training_tickers.txt`: Tickers whose histories will be trained on by the neural network.
 5) `stock_lists/trading_tickers.txt`: Tickers that all of the example strategies will trade.
 4) `stock_lists/stock_universe.txt`: Tickers whose histories `strategies.py` can access. *All traded tickers* must be in 
     this list, and all tickers in this list must have a history that extend past the backtesting start date.
