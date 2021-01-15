@@ -1,10 +1,9 @@
 import os
 import datetime
 import json
-from time import time
 import numpy as np
 import yfinance as yf
-import pandas as pd
+import pandas as pd # hidden requirement: tables
 
 import technicals as tech
 import moredata
