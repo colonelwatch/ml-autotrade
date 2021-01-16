@@ -142,7 +142,11 @@ def neural_squareweighted_split_value(portfolio, market, target_tickers):
     predictions = predictreturns(df, target_tickers)
 
     # Square the percentage changes to emphasize higher predictions in the portfolio
-    predictions = {ticker:predictions[ticker]**2 for ticker in predictions if predictions[ticker] > 0}
+    for ticker, prediction in predictions.items():
+        if prediction > 0:
+            predictions[ticker] = prediction**2
+        else:
+            predictions[ticker] = prediction
     
     return_sum = 0
     wanted_tickers = []
