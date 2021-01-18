@@ -9,17 +9,22 @@ trading_stocks = db.load_txt('./stock_lists/trading_tickers.txt')
 
 # <Classic Trading Strategies>
 
-# Liquidates all holdings and splits total buying power equally between passed tickers, should only be run once, but
-#  technically can be run every day when backtesting.
+# Liquidates all holdings and splits total buying power equally between passed tickers, then does nothing
+bought_once = False
 def buy_and_hold(portfolio, market, target_tickers):
-    holdings = portfolio.holdings
-    for ticker in holdings:
-        if holdings[ticker] != 0: # Never send orders of quantity 0
-            portfolio.market_sell(ticker, holdings[ticker])
-    cash = portfolio.cash
-    cash_split = cash/len(target_tickers)
-    for ticker in target_tickers:
-        portfolio.market_buy(ticker, cash_split/market.price(ticker))
+    global bought_once
+    if not bought_once:
+        holdings = portfolio.holdings
+        for ticker in holdings:
+            if holdings[ticker] != 0: # Never send orders of quantity 0
+                portfolio.market_sell(ticker, holdings[ticker])
+        cash = portfolio.cash
+        cash_split = cash/len(target_tickers)
+        for ticker in target_tickers:
+            portfolio.market_buy(ticker, cash_split/market.price(ticker))
+        bought_once = True
+    else:
+        pass
 buy_and_hold.name = 'Buy and Hold'
 buy_and_hold.target_tickers = trading_stocks
 
