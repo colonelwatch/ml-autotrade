@@ -62,7 +62,7 @@ class historyDataset(torch.utils.data.Dataset):
         
         return input_data, label
 
-def generatetrainingLoaders(df, shuffle, batch_size, **kwargs):
+def generate_split_loaders(df, shuffle, batch_size, **kwargs):
     datasets_training = []
     datasets_validation = []
     

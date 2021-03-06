@@ -12,11 +12,16 @@ with open('config.json', 'r') as infile:
 
 eval_stocks = db.load_txt('./stock_lists/training_tickers.txt')
 
-df = db.download_history(eval_stocks, cache_name='eval_stocks', start='2000-01-01', interval='1d')
+df = db.download_history(eval_stocks, cache_name='eval_stocks', start='2018-01-02', interval='1d')
 
 df = db.apply_config_transforms(df, CONFIG_TRANSFORMS) # Adds more data (technicals, etc)
 
-loader_training, loader_validation = neural.generatetrainingLoaders(df, shuffle=True, batch_size=100, date='2018-01-02')
+# Produces datasets each of the histories then samples randomly from them
+datasets = []
+for ticker in df.columns.levels[0]:
+    datasets.append(neural.historyDataset(df[ticker].dropna()))
+dataset = torch.utils.data.ConcatDataset(datasets)
+loader = torch.utils.data.DataLoader(dataset, batch_size=100, shuffle=True, drop_last=True)
 
 state = torch.load('model.pt')
 n_input = state['n_input']
@@ -25,7 +30,7 @@ model.load_state_dict(state['model'])
 model.eval()
 print('LSTM loaded')
 
-data, label = next(iter(loader_validation))
+data, label = next(iter(loader))
 data = data.float()
 
 out_norm = model(data).detach().view(-1).numpy()
