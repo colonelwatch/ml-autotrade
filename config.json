@@ -9,6 +9,7 @@
         "crosscorrelate": [
             "^GSPC"
         ],
+        "moredata": [],
         "drop": [
             "Adj Close",
             "^GSPC Stock Splits",

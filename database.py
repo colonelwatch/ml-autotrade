@@ -102,6 +102,8 @@ def apply_config_transforms(df, config_transforms):
         transforms.append(tech.TECH_DICT[namestring])
     for ticker in config_transforms['crosscorrelate']:
         transforms.append(moredata.crosscorrelate(ticker))
+    for namestring in config_transforms['moredata']:
+        transforms.append(moredata.MOREDATA_DICT[namestring])
     df = _attach(df, *transforms)
 
     drops = []
