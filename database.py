@@ -1,5 +1,4 @@
 import os
-import datetime
 import json
 import numpy as np
 import yfinance as yf
@@ -30,8 +29,7 @@ def download_history(tickers, cache_name=None, enforce_start=False, **kwargs):
     if cache_name:
         kwargs['tickers'] = tickers # Integrates tickers into kwargs for comparison
 
-        dt = datetime.date.today()
-        filename = f'./cache/{dt}_{cache_name}.h5'
+        filename = f'./cache/{cache_name}.h5'
         try:
             df, kwargs_loaded = load_h5(filename)
             if kwargs_loaded == kwargs:
