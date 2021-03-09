@@ -54,6 +54,7 @@ def main():
     for epoch in range(EPOCHS):
         loader_iter = iter(loader_train)
         iterations_per_epoch = len(loader_train)
+        valid_iter = iter(loader_valid)
         for iteration in range(iterations_per_epoch):
             data, target = next(loader_iter)
             data = data.float().to(device)
@@ -68,18 +69,20 @@ def main():
             if iteration%100 == 0:
                 model.eval()
 
-                data, target = next(iter(loader_valid))
+                data, target = next(valid_iter)
                 data = data.float().to(device)
                 target = target.float().to(device)
 
                 holdoutoutput = model(data)
                 holdoutloss = loss_func(holdoutoutput, target)
 
+                loss_item = loss.item()
+                holdoutloss_item = holdoutloss.item()
                 print(f'Iteration and Epoch: {iteration}/{iterations_per_epoch} {epoch}/{EPOCHS}....... ', end='')
-                print(f'Training Loss: {loss.item():.4f}', end=' ')
-                print(f'Validation Loss: {holdoutloss.item():.4f}')
-                loss_train.append(loss.item())
-                loss_valid.append(holdoutloss.item())
+                print(f'Training Loss: {loss_item:.6f}', end=' ')
+                print(f'Validation Loss: {holdoutloss_item:.6f}')
+                loss_train.append(loss_item)
+                loss_valid.append(holdoutloss_item)
 
                 model.train()
 
