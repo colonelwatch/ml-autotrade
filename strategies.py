@@ -1,3 +1,4 @@
+import numpy as np
 import torch
 
 import database as db
@@ -44,14 +45,16 @@ def predictreturns(df, target_tickers):
     tensor_length = neural.INTERVAL_TENSOR_SIZE
     
     df = df[target_tickers]
-    df_slice = db.sub_df(df, -tensor_length, tensor_length)
+    df_slice = df.iloc[-tensor_length:]
     
     # Pulls the close data from the dataframe to get the parameters to undo normalization later
     df_slice_close = df_slice.xs('Close', level=1, axis=1)
     mn = df_slice_close.min().values
     mx = df_slice_close.max().values
     
-    arr = db.normalize(df_slice).values
+    with np.errstate(divide='ignore', invalid='ignore'):
+        arr = db.normalize(df_slice.values)
+        arr = np.nan_to_num(arr, copy=False, nan=0, posinf=0, neginf=0)
     # Converts dataframe into tensor with dimensions (batch/tickers, length/time, features/indicators)
     input_tensor = torch.tensor(arr).reshape(tensor_length, -1, n_input).permute(1, 0, 2).float()
     

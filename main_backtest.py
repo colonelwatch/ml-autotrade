@@ -21,9 +21,9 @@ class virtualMarket:
         self.data = df
         self.index = 1
     def price(self, ticker):
-        return self.data[ticker]['Close'].iloc[self.index+DF_LENGTH-1] # Gets last price in series
+        return self.data.iloc[self.index+DF_LENGTH-1][ticker]['Close'] # Gets last price in series
     def latest_data(self):
-        df_slice = db.sub_df(self.data, self.index, DF_LENGTH) # Generates 'latest' market data
+        df_slice = df.iloc[self.index:self.index+DF_LENGTH]
         return df_slice
     def next_day(self):
         self.index += 1

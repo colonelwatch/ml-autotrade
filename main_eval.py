@@ -20,7 +20,7 @@ def main():
     # Produces datasets each of the histories then samples randomly from them
     datasets = []
     for ticker in df.columns.levels[0]:
-        datasets.append(neural.historyDataset_cached(df[ticker].dropna(), './cache/historyDataset_eval_cache.h5' , ticker))
+        datasets.append(neural.historyDataset(df[ticker].dropna(), './cache/historyDataset_eval_cache.h5' , ticker))
     dataset = torch.utils.data.ConcatDataset(datasets)
     loader = torch.utils.data.DataLoader(dataset, batch_size=100, shuffle=True, drop_last=True)
 

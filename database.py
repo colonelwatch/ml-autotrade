@@ -1,5 +1,6 @@
 import os
 import json
+import numba
 import numpy as np
 import yfinance as yf
 import pandas as pd # hidden requirement: tables
@@ -113,16 +114,6 @@ def apply_config_transforms(df, config_transforms):
     
     return df
 
-# Behaves like C sub_str but for dfs and multi-indexes
-# Outputs a df smaller than passed size if there is not enough rows
-def sub_df(df, index, size):
-    end_index = index+size
-    if end_index != 0:
-        df = df.iloc[index:end_index]
-    else: # Special case for negative indexing
-        df = df.iloc[index:]
-    return df
-
 def count_columns(df, level):
     return len(df.columns.levels[level])
 
@@ -143,12 +134,32 @@ def split(df, ratio=None, date=None):
     
     return training_df, validation_df
 
-# Min-max normalization
-def normalize(df, exclude_label=False):
-    if exclude_label:
-        df_input = df.iloc[0:-1]
-        df = (df-df_input.min()) / (df_input.max()-df_input.min())
-    else:
-        df = (df-df.min()) / (df.max()-df.min())
-    df = df.replace([np.inf, -np.inf, np.nan], 0)
-    return df
+# <Numpy Array Functions>
+
+@numba.njit
+def _row_apply(arr, func):
+    row_results = np.empty(arr.shape[1])
+    for i in range(arr.shape[1]):
+        row_results[i] = func(arr[:, i])
+    return row_results
+
+@numba.njit(error_model='numpy')
+def masked_normalize(arr):
+    arr_max = _row_apply(arr[:-1], np.max)
+    arr_min = _row_apply(arr[:-1], np.min)
+    arr_normalized = (arr-arr_min) / (arr_max-arr_min) # doesn't mutate original arr
+    return arr_normalized
+
+@numba.njit(error_model='numpy')
+def normalize(arr):
+    arr_max = _row_apply(arr, np.max)
+    arr_min = _row_apply(arr, np.min)
+    arr_normalized = (arr-arr_min) / (arr_max-arr_min) # doesn't mutate original arr
+    return arr_normalized
+
+@numba.njit(parallel=True)
+def batch_apply(batch_arr, func):
+    batch_norm_arr = np.empty(batch_arr.shape)
+    for i in numba.prange(batch_arr.shape[0]):
+        batch_norm_arr[i] = func(batch_arr[i])
+    return batch_norm_arr
