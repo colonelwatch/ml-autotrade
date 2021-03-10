@@ -75,7 +75,7 @@ def _process_arr_handle(workQueue, writeQueue):
         # Normalize while supressing divide by zero (prices don't change over many days sometimes)
         with np.errstate(divide='ignore', invalid='ignore'):
             arr_max = np.amax(arr_idx, axis=0, keepdims=True, initial=0, where=mask)
-            arr_min = np.amin(arr_idx, axis=0, keepdims=True, initial=0, where=mask)
+            arr_min = np.amin(arr_idx, axis=0, keepdims=True, initial=np.inf, where=mask)
             arr_idx = (arr_idx-arr_min) / (arr_max-arr_min)
         np.nan_to_num(arr_idx, copy=False, nan=0, posinf=0, neginf=0)
 
