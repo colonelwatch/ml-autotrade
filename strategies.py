@@ -73,7 +73,7 @@ def predictreturns(df, target_tickers):
 
 def neural_split_value(portfolio, market, target_tickers):
     holdings = portfolio.holdings
-    df = market.latest_data()
+    df = market.latest_data
     predictions = predictreturns(df, target_tickers)
     
     wanted_tickers = []
@@ -107,7 +107,7 @@ neural_split_value.target_tickers = trading_stocks
 
 def neural_weighted_split_value(portfolio, market, target_tickers):
     holdings = portfolio.holdings
-    df = market.latest_data()
+    df = market.latest_data
     predictions = predictreturns(df, target_tickers)
     
     return_sum = 0
@@ -146,7 +146,7 @@ neural_weighted_split_value.target_tickers = trading_stocks
 
 def neural_squareweighted_split_value(portfolio, market, target_tickers):
     holdings = portfolio.holdings
-    df = market.latest_data()
+    df = market.latest_data
     predictions = predictreturns(df, target_tickers)
 
     # Square the percentage changes to emphasize higher predictions in the portfolio

@@ -19,14 +19,15 @@ df = db.apply_config_transforms(df, CONFIG_TRANSFORMS) # Adds more data (technic
 class virtualMarket:
     def __init__(self, df):
         self.data = df
-        self.index = 1
+        self.index = 0
+        self.latest_data = self.data.iloc[self.index:self.index+DF_LENGTH]
+        self.latest_prices = dict(self.latest_data.iloc[-1].xs('Close', level=1))
     def price(self, ticker):
-        return self.data.iloc[self.index+DF_LENGTH-1][ticker]['Close'] # Gets last price in series
-    def latest_data(self):
-        df_slice = df.iloc[self.index:self.index+DF_LENGTH]
-        return df_slice
+        return self.latest_prices[ticker] # Gets last price in series
     def next_day(self):
         self.index += 1
+        self.latest_data = df.iloc[self.index:self.index+DF_LENGTH]
+        self.latest_prices = dict(self.latest_data.iloc[-1].xs('Close', level=1))
         # If there are not enough days in the history to fill a tensor, return False
         if self.index+DF_LENGTH <= len(self.data.index):
             return True
@@ -74,8 +75,8 @@ for strategy in st.strategies:
 
 def day_actions():
     for strategy, portfolio in portfolios.items():
-        strategy(portfolio, vMarket, strategy.target_tickers)
         portfolio.updateValueHistory()
+        strategy(portfolio, vMarket, strategy.target_tickers)
 
 def plotStrategies():
     for strategy, portfolio in portfolios.items():
