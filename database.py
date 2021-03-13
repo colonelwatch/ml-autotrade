@@ -163,3 +163,10 @@ def batch_apply(batch_arr, func):
     for i in numba.prange(batch_arr.shape[0]):
         batch_norm_arr[i] = func(batch_arr[i])
     return batch_norm_arr
+
+@numba.njit(parallel=True)
+def masked_batch_apply(batch_arr, dim_mask, func):
+    batch_norm_arr = np.empty(batch_arr.shape)
+    batch_norm_arr[:, :, ~dim_mask] = batch_arr[:, :, ~dim_mask]
+    batch_norm_arr[:, :, dim_mask] = batch_apply(batch_arr[:, :, dim_mask], func)
+    return batch_norm_arr

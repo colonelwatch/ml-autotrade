@@ -55,6 +55,8 @@ class historyDataset(torch.utils.data.Dataset):
         self.id = id
         self.example_shape = (TOTAL_INTERVAL_SIZE, len(df.columns))
         self.close_index = list(df.columns).index('Close')
+        do_not_normalize = ['mon_oh', 'tues_oh', 'wed_oh', 'thurs_oh', 'fri_oh', 'sat_oh', 'sun_oh']
+        do_not_normalize_mask = np.array([False if column in do_not_normalize else True for column in df.columns])
         
         params = {
             'example_shape': self.example_shape,
@@ -69,7 +71,7 @@ class historyDataset(torch.utils.data.Dataset):
             arr = df.values
             batch_arr = np.array([arr[i:i+TOTAL_INTERVAL_SIZE] for i in range(self.len)])
             with np.errstate(divide='ignore', invalid='ignore'):
-                batch_norm_arr = db.batch_apply(batch_arr, db.masked_normalize)
+                batch_norm_arr = db.masked_batch_apply(batch_arr, do_not_normalize_mask, db.masked_normalize)
                 batch_norm_arr = np.nan_to_num(batch_norm_arr, copy=False, nan=0, posinf=0, neginf=0)
             h5arr[:] = batch_norm_arr
 

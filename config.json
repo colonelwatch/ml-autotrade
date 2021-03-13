@@ -9,7 +9,9 @@
         "crosscorrelate": [
             "^GSPC"
         ],
-        "moredata": [],
+        "moredata": [
+            "day_of_week"
+        ],
         "drop": [
             "Adj Close",
             "^GSPC Stock Splits",
