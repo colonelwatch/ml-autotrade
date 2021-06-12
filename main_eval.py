@@ -53,7 +53,20 @@ def main():
     accuracy_random = (np.sum(np.logical_and(dx_label < 0, random))+np.sum(np.logical_and(dx_label > 0, random))) / 100
     print(f'Accuracy of always predicting randomly: {accuracy_random:.3f}')
 
+    # Below are two ways to order the data, the correlation in both representations should be strong
+
+    # Ordered by predicted change
     p = np.argsort(dx_label)
+    dx_label = dx_label[p]
+    dx_norm = dx_norm[p]
+
+    plt.plot(dx_label, '.r')
+    plt.plot(dx_norm, '.g')
+    plt.plot(np.zeros(100))
+    plt.show()
+
+    # Ordered by true change
+    p = np.argsort(dx_norm)
     dx_label = dx_label[p]
     dx_norm = dx_norm[p]
 
